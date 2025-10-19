@@ -4,13 +4,18 @@
  * @for p5
  */
 
-import p5 from './main';
-import * as constants from './constants';
-import './p5.Graphics';
-import './p5.Renderer2D';
-import '../webgl/p5.RendererGL';
-let defaultId = 'defaultCanvas0'; // this gets set again in createCanvas
-const defaultClass = 'p5Canvas';
+import p5 from "./main";
+import * as constants from "./constants";
+import "./p5.Graphics";
+import "./p5.Renderer2D";
+import "../webgl/p5.RendererGL";
+
+// import for Oriel ESP32-S3 implementation
+import "./p5.RendererOriel";
+// end Oriel engine import
+
+let defaultId = "defaultCanvas0"; // this gets set again in createCanvas
+const defaultClass = "p5Canvas";
 
 /**
  * Creates a canvas element on the web page.
@@ -123,8 +128,8 @@ const defaultClass = 'p5Canvas';
  * @param  {HTMLCanvasElement} [canvas]
  * @return {p5.Renderer}
  */
-p5.prototype.createCanvas = function(w, h, renderer, canvas) {
-  p5._validateParameters('createCanvas', arguments);
+p5.prototype.createCanvas = function (w, h, renderer, canvas) {
+  p5._validateParameters("createCanvas", arguments);
   //optional: renderer, otherwise defaults to p2d
 
   let r;
@@ -151,9 +156,9 @@ p5.prototype.createCanvas = function(w, h, renderer, canvas) {
         //if defaultCanvas already exists
         c.parentNode.removeChild(c); //replace the existing defaultCanvas
         const thisRenderer = this._renderer;
-        this._elements = this._elements.filter(e => e !== thisRenderer);
+        this._elements = this._elements.filter((e) => e !== thisRenderer);
       }
-      c = document.createElement('canvas');
+      c = document.createElement("canvas");
       c.id = defaultId;
       c.classList.add(defaultClass);
     } else {
@@ -161,7 +166,7 @@ p5.prototype.createCanvas = function(w, h, renderer, canvas) {
         if (canvas) {
           c = canvas;
         } else {
-          c = document.createElement('canvas');
+          c = document.createElement("canvas");
         }
         let i = 0;
         while (document.getElementById(`defaultCanvas${i}`)) {
@@ -179,7 +184,7 @@ p5.prototype.createCanvas = function(w, h, renderer, canvas) {
     // set to invisible if still in setup (to prevent flashing with manipulate)
     if (!this._setupDone) {
       c.dataset.hidden = true; // tag to show later
-      c.style.visibility = 'hidden';
+      c.style.visibility = "hidden";
     }
 
     if (this._userNode) {
@@ -187,28 +192,27 @@ p5.prototype.createCanvas = function(w, h, renderer, canvas) {
       this._userNode.appendChild(c);
     } else {
       //create main element
-      if (document.getElementsByTagName('main').length === 0) {
-        let m = document.createElement('main');
+      if (document.getElementsByTagName("main").length === 0) {
+        let m = document.createElement("main");
         document.body.appendChild(m);
       }
       //append canvas to main
-      document.getElementsByTagName('main')[0].appendChild(c);
+      document.getElementsByTagName("main")[0].appendChild(c);
     }
   }
 
   // Init our graphics renderer
   //webgl mode
   if (r === constants.WEBGL) {
-    this._setProperty('_renderer', new p5.RendererGL(c, this, true));
+    this._setProperty("_renderer", new p5.RendererGL(c, this, true));
     this._elements.push(this._renderer);
-    const dimensions =
-      this._renderer._adjustDimensions(w, h);
+    const dimensions = this._renderer._adjustDimensions(w, h);
     w = dimensions.adjustedWidth;
     h = dimensions.adjustedHeight;
   } else {
     //P2D mode
     if (!this._defaultGraphicsCreated) {
-      this._setProperty('_renderer', new p5.Renderer2D(c, this, true));
+      this._setProperty("_renderer", new p5.Renderer2D(c, this, true));
       this._defaultGraphicsCreated = true;
       this._elements.push(this._renderer);
     }
@@ -303,20 +307,19 @@ p5.prototype.createCanvas = function(w, h, renderer, canvas) {
  * </code>
  * </div>
  */
-p5.prototype.resizeCanvas = function(w, h, noRedraw) {
-  p5._validateParameters('resizeCanvas', arguments);
+p5.prototype.resizeCanvas = function (w, h, noRedraw) {
+  p5._validateParameters("resizeCanvas", arguments);
   if (this._renderer) {
     // save canvas properties
     const props = {};
     for (const key in this.drawingContext) {
       const val = this.drawingContext[key];
-      if (typeof val !== 'object' && typeof val !== 'function') {
+      if (typeof val !== "object" && typeof val !== "function") {
         props[key] = val;
       }
     }
     if (this._renderer instanceof p5.RendererGL) {
-      const dimensions =
-        this._renderer._adjustDimensions(w, h);
+      const dimensions = this._renderer._adjustDimensions(w, h);
       w = dimensions.adjustedWidth;
       h = dimensions.adjustedHeight;
     }
@@ -361,7 +364,7 @@ p5.prototype.resizeCanvas = function(w, h, noRedraw) {
  * </code>
  * </div>
  */
-p5.prototype.noCanvas = function() {
+p5.prototype.noCanvas = function () {
   if (this.canvas) {
     this.canvas.parentNode.removeChild(this.canvas);
   }
@@ -479,16 +482,16 @@ p5.prototype.noCanvas = function() {
  * @param  {HTMLCanvasElement} [canvas]
  * @return {p5.Graphics}
  */
-p5.prototype.createGraphics = function(w, h, ...args) {
-/**
-  * args[0] is expected to be renderer
-  * args[1] is expected to be canvas
-  */
+p5.prototype.createGraphics = function (w, h, ...args) {
+  /**
+   * args[0] is expected to be renderer
+   * args[1] is expected to be canvas
+   */
   if (args[0] instanceof HTMLCanvasElement) {
     args[1] = args[0];
     args[0] = constants.P2D;
   }
-  p5._validateParameters('createGraphics', arguments);
+  p5._validateParameters("createGraphics", arguments);
   return new p5.Graphics(w, h, args[0], this, args[1]);
 };
 
@@ -628,7 +631,7 @@ p5.prototype.createGraphics = function(w, h, ...args) {
  * </code>
  * </div>
  */
-p5.prototype.createFramebuffer = function(options) {
+p5.prototype.createFramebuffer = function (options) {
   return new p5.Framebuffer(this, options);
 };
 
@@ -712,8 +715,8 @@ p5.prototype.createFramebuffer = function(options) {
  * </code>
  * </div>
  */
-p5.prototype.clearDepth = function(depth) {
-  this._assert3d('clearDepth');
+p5.prototype.clearDepth = function (depth) {
+  this._assert3d("clearDepth");
   this._renderer.clearDepth(depth);
 };
 
@@ -1183,12 +1186,12 @@ p5.prototype.clearDepth = function(depth) {
  * </code>
  * </div>
  */
-p5.prototype.blendMode = function(mode) {
-  p5._validateParameters('blendMode', arguments);
+p5.prototype.blendMode = function (mode) {
+  p5._validateParameters("blendMode", arguments);
   if (mode === constants.NORMAL) {
     // Warning added 3/26/19, can be deleted in future (1.0 release?)
     console.warn(
-      'NORMAL has been deprecated for use in blendMode. defaulting to BLEND instead.'
+      "NORMAL has been deprecated for use in blendMode. defaulting to BLEND instead."
     );
     mode = constants.BLEND;
   }

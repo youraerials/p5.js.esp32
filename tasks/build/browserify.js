@@ -10,8 +10,6 @@ const bannerTemplate =
   '/*! p5.js v<%= pkg.version %> <%= grunt.template.today("mmmm dd, yyyy") %> */';
 
 module.exports = function(grunt) {
-  const srcFilePath = require.resolve('../../src/app.js');
-
   grunt.registerTask(
     'browserify',
     'Compile the p5.js source with Browserify',
@@ -19,10 +17,18 @@ module.exports = function(grunt) {
       const isMin = param === 'min';
       const isTest = param === 'test';
       const isDev = param === 'dev';
+      const isOriel = param === 'oriel';
+
+      // Use minimal entry point for Oriel builds
+      const srcFilePath = isOriel
+        ? require.resolve('../../src/app-oriel-minimal.js')
+        : require.resolve('../../src/app.js');
 
       const filename = isMin
         ? 'p5.pre-min.js'
-        : isTest ? 'p5-test.js' : 'p5.js';
+        : isTest ? 'p5-test.js'
+        : isOriel ? 'p5-oriel.js'
+        : 'p5.js';
 
       // This file will not exist until it has been built
       const libFilePath = resolve('lib/' + filename);
@@ -56,6 +62,17 @@ module.exports = function(grunt) {
           .ignore('i18next-browser-languagedetector');
       }
 
+      if (isOriel) {
+        // Exclude modules not needed for Oriel embedded platform
+        browserified = browserified
+          .exclude('../../docs/reference/data.json')
+          .exclude('../../../docs/parameterData.json')
+          .exclude('../../translations')
+          .exclude('./browser_errors')
+          .ignore('i18next')
+          .ignore('i18next-browser-languagedetector');
+      }
+
       if (!isDev) {
         browserified = browserified.exclude('../../translations/dev');
       }
@@ -66,6 +83,16 @@ module.exports = function(grunt) {
 
       if (isTest) {
         babelifyOpts.envName = 'test';
+      }
+
+      if (isOriel) {
+        // QuickJS needs ES5 compatibility
+        babelifyOpts.presets = [
+          ['@babel/preset-env', {
+            targets: { ie: '11' },  // Target old browsers for maximum compatibility
+            modules: false
+          }]
+        ];
       }
 
       const bundle = browserified

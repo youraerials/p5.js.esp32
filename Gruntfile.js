@@ -1,89 +1,89 @@
 // these requires allow us to use es6 features such as
 // `import`/`export` and `async`/`await` in the Grunt tasks
 // we load from other files (`tasks/`)
-require('regenerator-runtime/runtime');
-require('@babel/register');
+require("regenerator-runtime/runtime");
+require("@babel/register");
 
-module.exports = grunt => {
-  const connectConfig = open => {
+module.exports = (grunt) => {
+  const connectConfig = (open) => {
     return {
       options: {
         directory: {
-          path: './',
+          path: "./",
           options: {
-            icons: true
-          }
+            icons: true,
+          },
         },
         port: 9001,
         open,
-        middleware: function(connect, options, middlewares) {
+        middleware: function (connect, options, middlewares) {
           middlewares.unshift(
-            require('connect-modrewrite')([
-              '^/assets/js/p5(\\.min)?\\.js(.*) /lib/p5$1.js$2 [L]',
-              '^/assets/js/p5\\.(sound)(\\.min)?\\.js(.*) /lib/addons/p5.$1$2.js$3 [L]'
+            require("connect-modrewrite")([
+              "^/assets/js/p5(\\.min)?\\.js(.*) /lib/p5$1.js$2 [L]",
+              "^/assets/js/p5\\.(sound)(\\.min)?\\.js(.*) /lib/addons/p5.$1$2.js$3 [L]",
             ]),
-            function(req, res, next) {
-              res.setHeader('Access-Control-Allow-Origin', '*');
-              res.setHeader('Access-Control-Allow-Methods', '*');
+            function (req, res, next) {
+              res.setHeader("Access-Control-Allow-Origin", "*");
+              res.setHeader("Access-Control-Allow-Methods", "*");
               return next();
             }
           );
           return middlewares;
-        }
-      }
+        },
+      },
     };
   };
 
   const gruntConfig = {
     // read in the package, used for knowing the current version, et al.
-    pkg: grunt.file.readJSON('package.json'),
+    pkg: grunt.file.readJSON("package.json"),
 
     // Configure style consistency checking for this file, the source, and the tests.
     eslint: {
       options: {
-        format: 'unix'
+        format: "unix",
       },
       build: {
         src: [
-          'Gruntfile.js',
-          'docs/preprocessor.js',
-          'utils/**/*.js',
-          'tasks/**/*.js'
-        ]
+          "Gruntfile.js",
+          "docs/preprocessor.js",
+          "utils/**/*.js",
+          "tasks/**/*.js",
+        ],
       },
       source: {
-        src: ['src/**/*.js']
+        src: ["src/**/*.js"],
       },
       test: {
-        src: ['test/**/*.js', '!test/js/*.js']
+        src: ["test/**/*.js", "!test/js/*.js"],
       },
       fix: {
         // src: is calculated below...
         options: {
           rules: {
-            'no-undef': 0,
-            'no-unused-vars': 0
+            "no-undef": 0,
+            "no-unused-vars": 0,
           },
-          fix: true
-        }
-      }
+          fix: true,
+        },
+      },
     },
 
-    'eslint-samples': {
+    "eslint-samples": {
       options: {
         parserOptions: {
-          ecmaVersion: 8
+          ecmaVersion: 8,
         },
-        format: 'unix'
+        format: "unix",
       },
       source: {
-        src: ['src/**/*.js']
+        src: ["src/**/*.js"],
       },
       fix: {
         options: {
-          fix: true
-        }
-      }
+          fix: true,
+        },
+      },
     },
 
     // Set up the watch task, used for live-reloading during development.
@@ -93,102 +93,102 @@ module.exports = grunt => {
     watch: {
       quick: {
         files: [
-          'src/**/*.js',
-          'src/**/*.frag',
-          'src/**/*.vert',
-          'src/**/*.glsl'
+          "src/**/*.js",
+          "src/**/*.frag",
+          "src/**/*.vert",
+          "src/**/*.glsl",
         ],
-        tasks: ['browserify:dev'],
+        tasks: ["browserify:dev"],
         options: {
-          livereload: true
-        }
+          livereload: true,
+        },
       },
       // Watch the codebase for changes
       main: {
-        files: ['src/**/*.js'],
-        tasks: ['newer:eslint:source', 'test'],
+        files: ["src/**/*.js"],
+        tasks: ["newer:eslint:source", "test"],
         options: {
-          livereload: true
-        }
+          livereload: true,
+        },
       },
       // watch the theme for changes
       reference_build: {
-        files: ['docs/yuidoc-p5-theme/**/*'],
-        tasks: ['yuidoc'],
+        files: ["docs/yuidoc-p5-theme/**/*"],
+        tasks: ["yuidoc"],
         options: {
           livereload: true,
-          interrupt: true
-        }
+          interrupt: true,
+        },
       },
       // Watch the codebase for doc updates
       // launch with 'grunt yui connect:yui watch:yui'
       yui: {
         files: [
-          'src/**/*.js',
-          'lib/addons/*.js',
-          'src/**/*.frag',
-          'src/**/*.vert',
-          'src/**/*.glsl'
+          "src/**/*.js",
+          "lib/addons/*.js",
+          "src/**/*.frag",
+          "src/**/*.vert",
+          "src/**/*.glsl",
         ],
         tasks: [
-          'browserify',
-          'browserify:min',
-          'yuidoc:prod',
-          'clean:reference',
-          'minjson',
-          'uglify'
+          "browserify",
+          "browserify:min",
+          "yuidoc:prod",
+          "clean:reference",
+          "minjson",
+          "uglify",
         ],
         options: {
-          livereload: true
-        }
-      }
+          livereload: true,
+        },
+      },
     },
 
     // Set up node-side (non-browser) mocha tests.
     mochaTest: {
       test: {
-        src: ['test/node/**/*.js'],
+        src: ["test/node/**/*.js"],
         options: {
-          reporter: 'spec',
-          require: '@babel/register',
-          ui: 'tdd'
-        }
-      }
+          reporter: "spec",
+          require: "@babel/register",
+          ui: "tdd",
+        },
+      },
     },
 
     // Set up the mocha task, used for running the automated tests.
     mochaChrome: {
       yui: {
         options: {
-          urls: ['http://localhost:9001/test/test-reference.html']
-        }
+          urls: ["http://localhost:9001/test/test-reference.html"],
+        },
       },
       test: {
         options: {
           urls: [
-            'http://localhost:9001/test/test.html',
-            'http://localhost:9001/test/test-minified.html'
-          ]
-        }
-      }
+            "http://localhost:9001/test/test.html",
+            "http://localhost:9001/test/test-minified.html",
+          ],
+        },
+      },
     },
 
     nyc: {
       report: {
         options: {
-          reporter: ['text-summary', 'html', 'json']
-        }
-      }
+          reporter: ["text-summary", "html", "json"],
+        },
+      },
     },
     babel: {
       options: {
-        presets: ['@babel/preset-env']
+        presets: ["@babel/preset-env"],
       },
       dist: {
         files: {
-          'lib/p5.pre-min.js': 'lib/p5.js'
-        }
-      }
+          "lib/p5.pre-min.js": "lib/p5.js",
+        },
+      },
     },
 
     // This minifies the javascript into a single file and adds a banner to the
@@ -197,48 +197,70 @@ module.exports = grunt => {
       options: {
         compress: {
           global_defs: {
-            IS_MINIFIED: true
-          }
+            IS_MINIFIED: true,
+          },
         },
         banner:
-          '/*! p5.js v<%= pkg.version %> <%= grunt.template.today("mmmm dd, yyyy") %> */ '
+          '/*! p5.js v<%= pkg.version %> <%= grunt.template.today("mmmm dd, yyyy") %> */ ',
       },
       dist: {
         files: {
-          'lib/p5.min.js': ['lib/p5.pre-min.js'],
-          'lib/modules/p5Custom.min.js': ['lib/modules/p5Custom.pre-min.js']
-        }
-      }
+          "lib/p5.min.js": ["lib/p5.pre-min.js"],
+          "lib/modules/p5Custom.min.js": ["lib/modules/p5Custom.pre-min.js"],
+        },
+      },
+
+      oriel: {
+        options: {
+          compress: {
+            dead_code: true,
+            drop_console: false, // Keep console for debugging
+            drop_debugger: true,
+            unused: true,
+          },
+          mangle: true,
+          output: {
+            comments: false,
+            ascii_only: true, // Avoid octal escapes - QuickJS doesn't like them
+            beautify: true, // Keep readable to avoid syntax issues
+            indent_level: 0, // But don't add indentation
+            bracketize: true, // Always use brackets - safer
+          },
+        },
+        files: {
+          "lib/p5-oriel.min.js": ["lib/p5-oriel.js"],
+        },
+      },
     },
 
     // this builds the documentation for the codebase.
     yuidoc: {
       prod: {
-        name: '<%= pkg.name %>',
-        description: '<%= pkg.description %>',
-        version: '<%= pkg.version %>',
-        url: '<%= pkg.homepage %>',
+        name: "<%= pkg.name %>",
+        description: "<%= pkg.description %>",
+        version: "<%= pkg.version %>",
+        url: "<%= pkg.homepage %>",
         options: {
-          paths: ['src/', 'lib/addons/'],
-          themedir: 'docs/yuidoc-p5-theme/',
-          helpers: ['docs/yuidoc-p5-theme/helpers/helpers_prod.js'],
-          preprocessor: './docs/preprocessor.js',
-          outdir: 'docs/reference/'
-        }
-      }
+          paths: ["src/", "lib/addons/"],
+          themedir: "docs/yuidoc-p5-theme/",
+          helpers: ["docs/yuidoc-p5-theme/helpers/helpers_prod.js"],
+          preprocessor: "./docs/preprocessor.js",
+          outdir: "docs/reference/",
+        },
+      },
     },
 
     clean: {
       // Clean up unused files generated by yuidoc
       reference: {
         src: [
-          'docs/reference/classes/',
-          'docs/reference/elements/',
-          'docs/reference/files/',
-          'docs/reference/modules/',
-          'docs/reference/api.js'
-        ]
-      }
+          "docs/reference/classes/",
+          "docs/reference/elements/",
+          "docs/reference/files/",
+          "docs/reference/modules/",
+          "docs/reference/api.js",
+        ],
+      },
     },
 
     // This is a static server which is used when testing connectivity for the
@@ -246,17 +268,56 @@ module.exports = grunt => {
     // It serves all the files in the test directory at http://localhost:9001/
     connect: {
       server: connectConfig(),
-      yui: connectConfig('http://127.0.0.1:9001/docs/reference/')
+      yui: connectConfig("http://127.0.0.1:9001/docs/reference/"),
     },
 
     // This minifies the data.json file created from the inline reference
     minjson: {
       compile: {
         files: {
-          './docs/reference/data.min.json': './docs/reference/data.json'
-        }
-      }
-    }
+          "./docs/reference/data.min.json": "./docs/reference/data.json",
+        },
+      },
+    },
+
+    // Terser minification for Oriel (modern, QuickJS-compatible)
+    terser: {
+      oriel: {
+        options: {
+          compress: {
+            dead_code: true,
+            drop_console: false,
+            drop_debugger: true,
+            unused: true,
+            global_defs: {
+              IS_MINIFIED: true, // Define IS_MINIFIED to skip translations loading
+            },
+          },
+          mangle: true,
+          format: {
+            comments: false,
+            ecma: 5, // Target ES5 for QuickJS
+            safari10: true, // Extra compatibility mode
+            keep_numbers: true, // Preserve numeric literal format for QuickJS compatibility
+          },
+        },
+        files: {
+          "lib/p5-oriel.min.js": ["lib/p5-oriel.js"],
+        },
+      },
+    },
+
+    // Shell commands for Oriel build fixes
+    shell: {
+      fixOrielNumericLiterals: {
+        command: [
+          'sed -E "s/([0-9]+\\.[0-9]+) \\./(\\1)./g" lib/p5-oriel.js > lib/p5-oriel-temp.js',
+          "mv lib/p5-oriel-temp.js lib/p5-oriel.js",
+          'sed -E "s/([0-9]+) \\./(\\1)./g" lib/p5-oriel.js > lib/p5-oriel-temp.js',
+          "mv lib/p5-oriel-temp.js lib/p5-oriel.js",
+        ].join(" && "),
+      },
+    },
   };
 
   // eslint fixes everything it checks:
@@ -288,58 +349,67 @@ module.exports = grunt => {
   // `grunt combineModules:module_1:module_2` where core
   // is included by default in all combinations always.
   // NOTE: "module_x" is the name of it's folder in /src.
-  grunt.loadTasks('tasks/build');
+  grunt.loadTasks("tasks/build");
 
   // Load tasks for testing
-  grunt.loadTasks('tasks/test');
+  grunt.loadTasks("tasks/test");
 
   // Load the external libraries used.
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-eslint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-yuidoc');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-minjson');
-  grunt.loadNpmTasks('grunt-mocha-test');
-  grunt.loadNpmTasks('grunt-newer');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-simple-nyc');
+  grunt.loadNpmTasks("grunt-contrib-connect");
+  grunt.loadNpmTasks("grunt-eslint");
+  grunt.loadNpmTasks("grunt-contrib-watch");
+  grunt.loadNpmTasks("grunt-contrib-yuidoc");
+  grunt.loadNpmTasks("grunt-contrib-uglify");
+  grunt.loadNpmTasks("grunt-terser"); // Modern minifier for Oriel
+  grunt.loadNpmTasks("grunt-shell"); // Shell commands for Oriel fixes
+  grunt.loadNpmTasks("grunt-minjson");
+  grunt.loadNpmTasks("grunt-mocha-test");
+  grunt.loadNpmTasks("grunt-newer");
+  grunt.loadNpmTasks("grunt-contrib-clean");
+  grunt.loadNpmTasks("grunt-simple-nyc");
 
   // Create the multitasks.
-  grunt.registerTask('build', [
-    'yui',
-    'browserify',
-    'browserify:min',
-    'uglify',
-    'browserify:test'
+  grunt.registerTask("build", [
+    "yui",
+    "browserify",
+    "browserify:min",
+    "uglify",
+    "browserify:test",
   ]);
-  grunt.registerTask('lint', ['lint:source', 'lint:samples']);
-  grunt.registerTask('lint:source', [
-    'eslint:build',
-    'eslint:source',
-    'eslint:test'
+  grunt.registerTask("lint", ["lint:source", "lint:samples"]);
+  grunt.registerTask("lint:source", [
+    "eslint:build",
+    "eslint:source",
+    "eslint:test",
   ]);
-  grunt.registerTask('lint:samples', [
-    'yui', // required for eslint-samples
-    'eslint-samples:source'
+  grunt.registerTask("lint:samples", [
+    "yui", // required for eslint-samples
+    "eslint-samples:source",
   ]);
-  grunt.registerTask('lint-fix', ['eslint:fix']);
-  grunt.registerTask('test', [
-    'build',
-    'connect:server',
-    'mochaChrome',
-    'mochaTest',
-    'nyc:report'
+  grunt.registerTask("lint-fix", ["eslint:fix"]);
+  grunt.registerTask("test", [
+    "build",
+    "connect:server",
+    "mochaChrome",
+    "mochaTest",
+    "nyc:report",
   ]);
-  grunt.registerTask('test:nobuild', [
-    'eslint:test',
-    'connect:server',
-    'mochaChrome',
-    'mochaTest',
-    'nyc:report'
+  grunt.registerTask("test:nobuild", [
+    "eslint:test",
+    "connect:server",
+    "mochaChrome",
+    "mochaTest",
+    "nyc:report",
   ]);
-  grunt.registerTask('yui', ['yuidoc:prod', 'clean:reference', 'minjson']);
-  grunt.registerTask('yui:test', ['yui', 'connect:yui', 'mochaChrome:yui']);
-  grunt.registerTask('yui:dev', ['yui', 'build', 'connect:yui', 'watch:yui']);
-  grunt.registerTask('default', ['lint', 'test']);
+  grunt.registerTask("yui", ["yuidoc:prod", "clean:reference", "minjson"]);
+  grunt.registerTask("yui:test", ["yui", "connect:yui", "mochaChrome:yui"]);
+  grunt.registerTask("yui:dev", ["yui", "build", "connect:yui", "watch:yui"]);
+  grunt.registerTask("default", ["lint", "test"]);
+
+  // grunt task for oriel build
+  grunt.registerTask("oriel", [
+    "browserify:oriel",
+    "shell:fixOrielNumericLiterals",
+    "terser:oriel",
+  ]);
 };
