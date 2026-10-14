@@ -4,7 +4,7 @@
  * @for p5
  */
 
-import p5 from '../main';
+import p5 from "../main";
 
 /**
  * Custom p5.js renderer for Oriel embedded system
@@ -22,11 +22,11 @@ p5.RendererOriel = class extends p5.Renderer {
     this._drawingState = {
       fillEnabled: true,
       strokeEnabled: true,
-      fillColor: '#FFFFFF',
-      strokeColor: '#000000',
+      fillColor: "#FFFFFF",
+      strokeColor: "#000000",
       strokeWeight: 1,
       textSize: 12,
-      textAlign: 'left'
+      textAlign: "left",
     };
 
     // p5.js checks these flags to determine if drawing should occur
@@ -34,10 +34,10 @@ p5.RendererOriel = class extends p5.Renderer {
     this._doStroke = true;
 
     // Drawing modes (p5.js expects these)
-    this._ellipseMode = 'center';
-    this._rectMode = 'corner';
+    this._ellipseMode = "center";
+    this._rectMode = "corner";
 
-    console.log('RendererOriel initialized for 360x360 display');
+    console.log("RendererOriel initialized for 360x360 display");
   }
 
   // Background
@@ -133,18 +133,24 @@ p5.RendererOriel = class extends p5.Renderer {
 
     if (this._drawingState.fillEnabled) {
       Oriel.display.drawFilledTriangle(
-        Math.round(x1), Math.round(y1),
-        Math.round(x2), Math.round(y2),
-        Math.round(x3), Math.round(y3),
+        Math.round(x1),
+        Math.round(y1),
+        Math.round(x2),
+        Math.round(y2),
+        Math.round(x3),
+        Math.round(y3),
         this._drawingState.fillColor
       );
     }
 
     if (this._drawingState.strokeEnabled) {
       Oriel.display.drawTriangle(
-        Math.round(x1), Math.round(y1),
-        Math.round(x2), Math.round(y2),
-        Math.round(x3), Math.round(y3),
+        Math.round(x1),
+        Math.round(y1),
+        Math.round(x2),
+        Math.round(y2),
+        Math.round(x3),
+        Math.round(y3),
         this._drawingState.strokeColor
       );
     }
@@ -155,7 +161,10 @@ p5.RendererOriel = class extends p5.Renderer {
     // Convert P5.js pixel size to LovyanGFX scale factor (1x, 2x, 3x, etc.)
     // P5.js default font height is ~8px at size 1
     // Sizes: 12px->1x, 16px->2x, 24px->3x, 32px->4x
-    const scaleFactor = Math.max(1, Math.round(this._drawingState.textSize / 8));
+    const scaleFactor = Math.max(
+      1,
+      Math.round(this._drawingState.textSize / 8)
+    );
 
     Oriel.display.drawText(
       Math.round(x),
@@ -210,7 +219,7 @@ p5.RendererOriel = class extends p5.Renderer {
   // Helper: Convert color arguments to hex string
   _colorToHex(...args) {
     // If single argument and it's a string, return as-is
-    if (args.length === 1 && typeof args[0] === 'string') {
+    if (args.length === 1 && typeof args[0] === "string") {
       return args[0];
     }
 
@@ -219,10 +228,12 @@ p5.RendererOriel = class extends p5.Renderer {
       const r = Math.round(args[0].levels[0]);
       const g = Math.round(args[0].levels[1]);
       const b = Math.round(args[0].levels[2]);
-      return '#' +
-             r.toString(16).padStart(2, '0') +
-             g.toString(16).padStart(2, '0') +
-             b.toString(16).padStart(2, '0');
+      return (
+        "#" +
+        r.toString(16).padStart(2, "0") +
+        g.toString(16).padStart(2, "0") +
+        b.toString(16).padStart(2, "0")
+      );
     }
 
     // Handle RGB arguments directly
@@ -240,16 +251,18 @@ p5.RendererOriel = class extends p5.Renderer {
       r = g = b = 255;
     }
 
-    return '#' +
-           r.toString(16).padStart(2, '0') +
-           g.toString(16).padStart(2, '0') +
-           b.toString(16).padStart(2, '0');
+    return (
+      "#" +
+      r.toString(16).padStart(2, "0") +
+      g.toString(16).padStart(2, "0") +
+      b.toString(16).padStart(2, "0")
+    );
   }
 
   // Resize (no-op for fixed display)
   resize(w, h) {
     // Oriel display is fixed at 360x360
-    console.log('resize() called but Oriel display is fixed at 360x360');
+    console.log("resize() called but Oriel display is fixed at 360x360");
   }
 
   // Clear (same as background)
@@ -294,5 +307,10 @@ p5.RendererOriel = class extends p5.Renderer {
   // Additional renderer properties that might be checked
   get isP3D() {
     return false; // We're a 2D renderer
+  }
+
+  // In p5.RendererOriel.js, expose the raw buffer
+  get buffer() {
+    return this._drawingContext.buffer; // Direct access to Oriel's framebuffer
   }
 };
